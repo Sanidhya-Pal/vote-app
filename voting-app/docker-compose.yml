@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: votingdb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  vote:
+    build: ./vote
+    container_name: vote
+    ports:
+      - "8080:5000"
+    depends_on:
+      - redis
+
+  worker:
+    build: ./worker
+    container_name: worker
+    depends_on:
+      - redis
+      - postgres
+
+  result:
+    build: ./result
+    container_name: result
+    ports:
+      - "8081:5000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres-data:
