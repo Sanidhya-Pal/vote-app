@@ -9,6 +9,14 @@ pipeline {
             }
         }
 
+	stage('Check Workspace') {
+    	    steps {
+        	sh 'pwd'
+        	sh 'ls -la'
+        	sh 'find . -maxdepth 2 -type d'
+    	    }
+	}
+
         stage('Build Vote Image') {
             steps {
                 sh 'docker build -t sanidhyapal/vote:latest vote'
