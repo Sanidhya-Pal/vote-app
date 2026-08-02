@@ -1,37 +1,53 @@
 pipeline {
     agent any
-	stages {
 
-    stage('Checkout') {
-        steps {
-            checkout scm
-        }
-    }
+    stages {
 
-    stage('Check Workspace') {
-        steps {
-            sh 'pwd'
-            sh 'ls -la'
-            sh 'find . -maxdepth 2 -type d'
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-    }
+
+        stage('Check Workspace') {
+            steps {
+                sh 'echo "Current Directory:"'
+                sh 'pwd'
+
+                sh 'echo "Workspace Contents:"'
+                sh 'ls -la'
+
+                sh 'echo "Directory Structure:"'
+                sh 'find . -maxdepth 2 -type d'
+            }
+        }
 
         stage('Build Vote Image') {
             steps {
-                sh 'docker build -t sanidhyapal/vote:latest vote'
+                sh 'docker build -t sanidhyapal/vote:latest voting-app/vote'
             }
         }
 
         stage('Build Worker Image') {
             steps {
-                sh 'docker build -t sanidhyapal/worker:latest worker'
+                sh 'docker build -t sanidhyapal/worker:latest voting-app/worker'
             }
         }
 
         stage('Build Result Image') {
             steps {
-                sh 'docker build -t sanidhyapal/result:latest result'
+                sh 'docker build -t sanidhyapal/result:latest voting-app/result'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'All Docker images built successfully!'
+        }
+
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
