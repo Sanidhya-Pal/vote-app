@@ -1,24 +1,15 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKERHUB_CREDENTIALS = 'dockerhub'
+    }
+
     stages {
 
         stage('Checkout') {
             steps {
                 checkout scm
-            }
-        }
-
-        stage('Check Workspace') {
-            steps {
-                sh 'echo "Current Directory:"'
-                sh 'pwd'
-
-                sh 'echo "Workspace Contents:"'
-                sh 'ls -la'
-
-                sh 'echo "Directory Structure:"'
-                sh 'find . -maxdepth 2 -type d'
             }
         }
 
@@ -39,15 +30,44 @@ pipeline {
                 sh 'docker build -t sanidhyapal/result:latest voting-app/result'
             }
         }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                }
+            }
+        }
+
+        stage('Push Vote Image') {
+            steps {
+                sh 'docker push sanidhyapal/vote:latest'
+            }
+        }
+
+        stage('Push Worker Image') {
+            steps {
+                sh 'docker push sanidhyapal/worker:latest'
+            }
+        }
+
+        stage('Push Result Image') {
+            steps {
+                sh 'docker push sanidhyapal/result:latest'
+            }
+        }
     }
 
     post {
         success {
-            echo 'All Docker images built successfully!'
+            echo 'Images built and pushed successfully!'
         }
-
         failure {
-            echo 'Pipeline failed!'
+            echo 'Pipeline failed.'
         }
     }
 }
