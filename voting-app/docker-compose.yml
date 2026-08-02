@@ -17,7 +17,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
 
   vote:
-    build: ./vote
+    image: sanidhyapal/vote:latest
     container_name: vote
     ports:
       - "8080:5000"
@@ -25,14 +25,14 @@ services:
       - redis
 
   worker:
-    build: ./worker
+    image: sanidhyapal/worker:latest
     container_name: worker
     depends_on:
       - redis
       - postgres
 
   result:
-    build: ./result
+    image: sanidhyapal/result:latest
     container_name: result
     ports:
       - "8081:5000"
