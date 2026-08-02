@@ -1,54 +1,17 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKERHUB_USERNAME = "sanidhyapal"
-    }
-
     stages {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Sanidhya-Pal/vote-app.git'
+                checkout scm
             }
         }
 
         stage('Build Vote Image') {
             steps {
-                sh 'docker build -t $DOCKERHUB_USERNAME/vote:latest voting-app/vote'
-            }
-        }
-
-        stage('Build Worker Image') {
-            steps {
-                sh 'docker build -t $DOCKERHUB_USERNAME/worker:latest voting-app/worker'
-            }
-        }
-
-        stage('Build Result Image') {
-            steps {
-                sh 'docker build -t $DOCKERHUB_USERNAME/result:latest voting-app/result'
-            }
-        }
-
-        stage('Docker Login') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                }
-            }
-        }
-
-        stage('Push Images') {
-            steps {
-                sh 'docker push $DOCKERHUB_USERNAME/vote:latest'
-                sh 'docker push $DOCKERHUB_USERNAME/worker:latest'
-                sh 'docker push $DOCKERHUB_USERNAME/result:latest'
+                sh 'docker build -t sanidhyapal/vote:latest voting-app/vote'
             }
         }
     }
