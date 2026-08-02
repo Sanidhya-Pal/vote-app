@@ -1,21 +1,20 @@
 pipeline {
     agent any
+	stages {
 
-    stages {
-
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
+    stage('Checkout') {
+        steps {
+            checkout scm
         }
+    }
 
-	stage('Check Workspace') {
-    	    steps {
-        	sh 'pwd'
-        	sh 'ls -la'
-        	sh 'find . -maxdepth 2 -type d'
-    	    }
-	}
+    stage('Check Workspace') {
+        steps {
+            sh 'pwd'
+            sh 'ls -la'
+            sh 'find . -maxdepth 2 -type d'
+        }
+    }
 
         stage('Build Vote Image') {
             steps {
