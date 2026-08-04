@@ -60,6 +60,17 @@ pipeline {
                 sh 'docker push sanidhyapal/result:latest'
             }
         }
+	stage('Deploy to Deployment EC2') {
+            steps {
+                sh '''
+                ssh -o StrictHostKeyChecking=no ubuntu@172.31.40.153 "
+                cd /home/ubuntu/voting-app
+                docker compose pull
+                docker compose up -d
+                "
+                '''
+            }
+        }
     }
 
     post {
